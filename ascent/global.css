@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Outdoor Climbing Theme - Natural & Modern */
+    --background: 225 20% 13%; /* #1a1d26 - bg-primary */
+    --foreground: 60 9% 98%; /* #fafaf9 - text-primary */
+    --card: 225 15% 18%; /* #272a35 - bg-secondary */
+    --card-foreground: 60 9% 98%; /* #fafaf9 - text-primary */
+    --popover: 225 15% 22%; /* #2f3340 - bg-elevated */
+    --popover-foreground: 60 9% 98%; /* #fafaf9 - text-primary */
+    --primary: 20 100% 62%; /* #ff7a3d - primary orange */
+    --primary-foreground: 225 20% 13%; /* dark text on primary */
+    --secondary: 217 91% 60%; /* #3b82f6 - accent-secondary blue */
+    --secondary-foreground: 60 9% 98%; /* #fafaf9 - text-primary */
+    --muted: 225 15% 18%; /* #272a35 - bg-secondary */
+    --muted-foreground: 214 15% 66%; /* #94a3b8 - text-secondary */
+    --accent: 160 84% 39%; /* #10b981 - accent green */
+    --accent-foreground: 60 9% 98%; /* #fafaf9 - text-primary */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 60 9% 98%;
+    --border: 225 12% 26%; /* #3a3d4a - border */
+    --input: 225 12% 26%; /* #3a3d4a - border */
+    --ring: 20 100% 62%; /* #ff7a3d - primary orange */
+    --radius: 0.625rem;
+    --chart-1: 20 100% 62%;
+    --chart-2: 160 84% 39%;
+    --chart-3: 217 91% 60%;
+    --chart-4: 40 35% 93%;
+    --chart-5: 215 16% 47%;
+  }
+
+  .dark:root {
+    /* Dark mode uses same climbing theme (already dark by default) */
+    --background: 225 20% 13%; /* #1a1d26 - bg-primary */
+    --foreground: 60 9% 98%; /* #fafaf9 - text-primary */
+    --card: 225 15% 18%; /* #272a35 - bg-secondary */
+    --card-foreground: 60 9% 98%; /* #fafaf9 - text-primary */
+    --popover: 225 15% 22%; /* #2f3340 - bg-elevated */
+    --popover-foreground: 60 9% 98%; /* #fafaf9 - text-primary */
+    --primary: 20 100% 62%; /* #ff7a3d - primary orange */
+    --primary-foreground: 225 20% 13%; /* dark text on primary */
+    --secondary: 217 91% 60%; /* #3b82f6 - accent-secondary blue */
+    --secondary-foreground: 60 9% 98%; /* #fafaf9 - text-primary */
+    --muted: 225 15% 18%; /* #272a35 - bg-secondary */
+    --muted-foreground: 214 15% 66%; /* #94a3b8 - text-secondary */
+    --accent: 160 84% 39%; /* #10b981 - accent green */
+    --accent-foreground: 60 9% 98%; /* #fafaf9 - text-primary */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 60 9% 98%;
+    --border: 225 12% 26%; /* #3a3d4a - border */
+    --input: 225 12% 26%; /* #3a3d4a - border */
+    --ring: 20 100% 62%; /* #ff7a3d - primary orange */
+    --chart-1: 20 100% 62%;
+    --chart-2: 160 84% 39%;
+    --chart-3: 217 91% 60%;
+    --chart-4: 40 35% 93%;
+    --chart-5: 215 16% 47%;
+  }
+}
