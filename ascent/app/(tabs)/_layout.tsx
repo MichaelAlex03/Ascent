@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router'
-import { Images, MessageCircle, User } from 'lucide-react-native'
+import { Images, MessageCircle, User, NotebookIcon } from 'lucide-react-native'
 
 const TabsLayout = () => {
     return (
@@ -28,6 +28,14 @@ const TabsLayout = () => {
                 options={{
                     tabBarIcon: ({ color }) => (
                         <MessageCircle size={24} color={color} />
+                    )
+                }}
+            />
+            <Tabs.Screen
+                name='Journal'
+                options={{
+                    tabBarIcon: ({ color }) => (
+                        <NotebookIcon size={24} color={color} />
                     )
                 }}
             />
