@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
-import { verifyWebhook } from '@clerk/express/webhooks';
+import { verifyClerkWebhook } from '../util/verifyClerkWebhook';
+import { handleUserCreatedWebhook } from '../services/webhook.services';
 
 export const handleClerkWebhook = async (req: Request, res: Response) => {
 
     try {
-        const evt = await verifyWebhook(req);
-
-        if (evt.type === "user.created"){
-            console.log("Test worked 33333")
+        const eventData = await verifyClerkWebhook(req);
+        if (eventData.type === "user.created"){
+            await handleUserCreatedWebhook(eventData.data.id)
         }
 
         return res.sendStatus(200);

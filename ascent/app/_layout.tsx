@@ -12,6 +12,8 @@ import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+// Prevent the splash screen from auto-hiding before asset loading is complete
+SplashScreen.preventAutoHideAsync();
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -37,8 +39,6 @@ export default function RootLayout() {
   );
 }
 
-SplashScreen.preventAutoHideAsync();
-
 function Routes() {
   const { isSignedIn, isLoaded } = useAuth();
 
@@ -57,6 +57,7 @@ function Routes() {
       {/* Screens only shown when the user is NOT signed in */}
       <Stack.Protected guard={!isSignedIn}>
         <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)/verify-second-factor" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)/sign-in" options={SIGN_IN_SCREEN_OPTIONS} />
         <Stack.Screen name="(auth)/sign-up" options={SIGN_UP_SCREEN_OPTIONS} />
         <Stack.Screen name="(auth)/reset-password" options={DEFAULT_AUTH_SCREEN_OPTIONS} />

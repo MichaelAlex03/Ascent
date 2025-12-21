@@ -35,7 +35,20 @@ export function SignInForm() {
         await setActive({ session: signInAttempt.createdSessionId });
         return;
       }
+      console.log(signInAttempt.status)
+
+      // Handle MFA requirement
+      if (signInAttempt.status === 'needs_second_factor') {
+        // Navigate to second factor verification screen
+        router.push({
+          pathname: '/(auth)/verify-second-factor',
+          params: { email }
+        });
+        return;
+      }
+
       // TODO: Handle other statuses
+      console.error('Unhandled sign-in status:', signInAttempt.status);
       console.error(JSON.stringify(signInAttempt, null, 2));
     } catch (err) {
       // See https://go.clerk.com/mRUDrIe for more info on error handling
