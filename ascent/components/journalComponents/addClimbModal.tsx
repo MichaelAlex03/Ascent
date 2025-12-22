@@ -58,7 +58,7 @@ const AddClimbModal = ({ visisble, onClose, onSave }: AddClimbProps) => {
             animationType='slide'
             transparent={true}
         >
-            <SafeAreaView className='flex-1 bg-black/40 justify-end'>
+            <SafeAreaView className='flex-1 bg-black/40 ' edges={['top']}>
                 <ScrollView>
                     <View className='rounded-3xl bg-[#1a1d26] border border-[#3a3d4a]'>
 
@@ -177,6 +177,12 @@ const AddClimbModal = ({ visisble, onClose, onSave }: AddClimbProps) => {
 
                                     />
                                 </View>
+                            </View>
+
+                            <View className='mt-4 mb-4'>
+                                <TouchableOpacity className='bg-primary rounded-xl py-3' onPress={onSave}>
+                                    <Text className='text-white font-bold text-xl text-center'>Save Climb</Text>
+                                </TouchableOpacity>
                             </View>
 
                         </View>

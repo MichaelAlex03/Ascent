@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { X, Plus, Minus, Check, Calendar, Mountain } from 'lucide-react-native'
 import AddClimbModal from '@/components/journalComponents/addClimbModal'
+import { useAuth } from '@clerk/clerk-expo'
 
 
 interface Climbs {
@@ -15,6 +16,8 @@ interface Climbs {
 
 const Journal = () => {
 
+  const { getToken } = useAuth();
+
   const [completedBoulders, setCompletedBoulders] = useState<Climbs[]>([]);
   const [completedRoutes, setCompletedRoutes] = useState<Climbs[]>([]);
   const [showBoulders, setShowBoulder] = useState<boolean>(true);
@@ -26,7 +29,19 @@ const Journal = () => {
   }
 
   const handleSaveClimb = async () => {
+    const token = await getToken()
 
+    try {
+      const response = await fetch("http://localhost:81/journals", {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      })
+      console.log(response)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
