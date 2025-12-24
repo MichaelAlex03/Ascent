@@ -3,6 +3,7 @@ import userRouter from "./routes/user.routes"
 import webhookRouter from "./routes/webhook.routes"
 import cors from 'cors'
 import { corsOptions } from "./config/corsOptions"
+import { clerkMiddleware } from '@clerk/express'
 import 'dotenv/config'
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(cors(corsOptions))
 app.use("/webhooks", express.raw({ type: 'application/json' }),  webhookRouter)
 
 app.use(express.json())
+app.use(clerkMiddleware())
 
 app.use("/users", userRouter);
 

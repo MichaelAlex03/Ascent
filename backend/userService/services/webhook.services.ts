@@ -1,5 +1,4 @@
-import { Request } from 'express'
-import { addClerkUser } from '../repositories/users.repo'
+import { addClerkUser } from '../repositories/webhook.repo'
 
 export const handleUserCreatedWebhook = async (id: string) => {
     await addClerkUser(id)

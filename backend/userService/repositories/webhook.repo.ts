@@ -1,4 +1,4 @@
-import { createSupabaseClerkClient, createSupabaseAdminClient } from '../config/supabase'
+import { createSupabaseAdminClient } from '../config/supabase'
 
 const webhookSupabase = createSupabaseAdminClient()
 

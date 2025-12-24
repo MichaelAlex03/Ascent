@@ -322,7 +322,6 @@ CREATE TABLE climbs (
     completion_type VARCHAR(50),  -- onsight, flash, redpoint, project
     notes TEXT,
     date_climbed DATE NOT NULL,
-    media_urls JSONB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );

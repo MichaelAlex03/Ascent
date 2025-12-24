@@ -1,48 +1,82 @@
-import { View, Text, TouchableOpacity, FlatList } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, TouchableOpacity, FlatList, Alert } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { X, Plus, Minus, Check, Calendar, Mountain } from 'lucide-react-native'
+import { Plus, Mountain } from 'lucide-react-native'
 import AddClimbModal from '@/components/journalComponents/addClimbModal'
 import { useAuth } from '@clerk/clerk-expo'
-
-
-interface Climbs {
-  type: string
-  grade: string
-  wallType: string
-  attempts: number
-  notes: string
-}
+import { Climb, CreateClimbInput, CreateClimbSchema } from '@/types/app'
 
 const Journal = () => {
 
   const { getToken } = useAuth();
 
-  const [completedBoulders, setCompletedBoulders] = useState<Climbs[]>([]);
-  const [completedRoutes, setCompletedRoutes] = useState<Climbs[]>([]);
+  const [completedBoulders, setCompletedBoulders] = useState<Climb[]>([]);
+  const [completedRoutes, setCompletedRoutes] = useState<Climb[]>([]);
   const [showBoulders, setShowBoulder] = useState<boolean>(true);
   const [showRoutes, setShowRoutes] = useState<boolean>(false);
   const [toggleAddClimb, setToggleAddClimb] = useState<boolean>(false);
+  const [refresh, setRefresh] = useState<number>(0)
 
   const closeAddClimbModal = () => {
     setToggleAddClimb(false);
   }
 
-  const handleSaveClimb = async () => {
+  const handleSaveClimb = async (climb: CreateClimbInput) => {
     const token = await getToken()
 
     try {
-      const response = await fetch("http://localhost:81/journals", {
-        method: "GET",
+      const response = await fetch(`${process.env.EXPO_PUBLIC_JOURNAL_API}/journals`, {
+        method: "POST",
         headers: {
-          "Authorization": `Bearer ${token}`
-        }
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(climb)
       })
-      console.log(response)
+
+      if (response.status === 201) {
+        Alert.alert("Climb Added", "Your climb was successfully added")
+        setRefresh(prev => prev + 1)
+        return;
+      }
+
+      Alert.alert("Failed to Add Climb", "Please try again");
     } catch (error) {
-      console.error(error)
+      console.error(error);
+      Alert.alert("Error", "Failed to add climb. Please check your connection.");
     }
   }
+
+  const fetchClimbs = async () => {
+    const token = await getToken()
+
+    try {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_JOURNAL_API}/journals`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+      })
+
+      if (response.status === 200) {
+        const climbs: Climb[] = await response.json();
+        const boulders = climbs.filter(c => c.climb_type === "boulder")
+        const routes = climbs.filter(c => c.climb_type === 'route')
+        setCompletedBoulders(boulders);
+        setCompletedRoutes(routes);
+        return;
+      }
+
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Failed To Get Climbs", "Climbs were not able to be retrieved");
+    }
+  }
+
+  useEffect(() => {
+    fetchClimbs();
+  }, [refresh])
 
   return (
     <SafeAreaView className='flex-1 bg-[#1a1d26]'>
@@ -60,7 +94,7 @@ const Journal = () => {
         </View>
 
         <FlatList
-          data={[]}
+          data={showBoulders ? completedBoulders : completedRoutes}
           renderItem={() => (<View></View>)}
           ListHeaderComponent={() => (
             <View className='flex flex-row mt-6 mx-auto border bg-card border-[#3a3d4a] rounded-xl gap-2 items-center justify-center'>

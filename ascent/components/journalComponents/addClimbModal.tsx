@@ -1,12 +1,13 @@
-import { View, Text, Modal, TouchableOpacity, TextInput, ScrollView } from 'react-native'
+import { View, Text, Modal, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { X, Plus, Minus } from 'lucide-react-native'
+import { Climb, CreateClimbInput, CreateClimbSchema } from '@/types/app'
 
 interface AddClimbProps {
     visisble: boolean
     onClose: () => void
-    onSave: () => void
+    onSave: (climb: CreateClimbInput) => void
 }
 
 const boulderGrades = [
@@ -44,11 +45,42 @@ const AddClimbModal = ({ visisble, onClose, onSave }: AddClimbProps) => {
     const [addBoulders, setAddBoulder] = useState<boolean>(true);
     const [addRoutes, setAddRoutes] = useState<boolean>(false);
     const [selectedGrade, setSelectedGrade] = useState<string>('');
-    const [selectedWallType, setSelectedWallType] = useState<WallType | null>(null);
+    const [selectedWallType, setSelectedWallType] = useState<'slab' | 'overhang' | 'vertical'>('slab');
     const [attempts, setAttempts] = useState<number>(1);
-    const [notes, SetNotes] = useState<string>('');
+    const [notes, setNotes] = useState<string>('');
+    const [isSaving, setIsSaving] = useState<boolean>(false);
 
     const grades = addBoulders ? boulderGrades : routeGrades;
+
+    const handleSave = async () => {
+        if (isSaving) return;
+
+        const climb: CreateClimbInput = {
+            climb_type: addBoulders ? 'boulder' : 'route',
+            grade: selectedGrade,
+            climb_wall_type: selectedWallType,
+            climb_attempts: attempts,
+            climb_notes: notes
+        }
+
+        // Validate Input 
+        const validation = CreateClimbSchema.safeParse(climb);
+        if (!validation.success) {
+            Alert.alert("Invalid Input", "One or more of the fields entered is empty or not entered correctly");
+            return;
+        }
+
+        setIsSaving(true);
+        try {
+            onSave(climb);
+        } catch (error) {
+            console.error(error);
+            Alert.alert("Failed To Add Climb", "Climb was not able to be added please try again")
+        } finally {
+            setIsSaving(false);
+            onClose();
+        }
+    }
 
 
     return (
@@ -57,10 +89,11 @@ const AddClimbModal = ({ visisble, onClose, onSave }: AddClimbProps) => {
             onRequestClose={onClose}
             animationType='slide'
             transparent={true}
+            statusBarTranslucent={true}
         >
-            <SafeAreaView className='flex-1 bg-black/40 ' edges={['top']}>
-                <ScrollView>
-                    <View className='rounded-3xl bg-[#1a1d26] border border-[#3a3d4a]'>
+            <SafeAreaView className='flex-1 bg-black/40' edges={['top', 'bottom']}>
+                <ScrollView contentContainerStyle={{ paddingTop: 20 }}>
+                    <View className='rounded-3xl bg-[#1a1d26] border border-[#3a3d4a] mt-4'>
 
                         <View className='flex flex-row justify-between items-center border-b border-[#3a3d4a] p-4'>
                             <Text className='text-white font-bold text-xl'>Add Climb</Text>
@@ -155,7 +188,7 @@ const AddClimbModal = ({ visisble, onClose, onSave }: AddClimbProps) => {
 
                                     <TouchableOpacity
                                         className='rounded-full flex items-center justify-center p-4 bg-primary'
-                                        onPress={() => setAttempts(attempts + 1)}
+                                        onPress={() => setAttempts(Math.min(999, attempts + 1))}
                                     >
                                         <Plus size={24} color={'white'} />
                                     </TouchableOpacity>
@@ -174,13 +207,15 @@ const AddClimbModal = ({ visisble, onClose, onSave }: AddClimbProps) => {
                                         multiline={true}
                                         numberOfLines={10}
                                         textAlignVertical='top'
-
+                                        value={notes}
+                                        onChangeText={(e) => setNotes(e)}
+                                        maxLength={999}
                                     />
                                 </View>
                             </View>
 
                             <View className='mt-4 mb-4'>
-                                <TouchableOpacity className='bg-primary rounded-xl py-3' onPress={onSave}>
+                                <TouchableOpacity className='bg-primary rounded-xl py-3' onPress={handleSave}>
                                     <Text className='text-white font-bold text-xl text-center'>Save Climb</Text>
                                 </TouchableOpacity>
                             </View>
