@@ -1,10 +1,12 @@
-import { View, Text, TouchableOpacity, FlatList, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, FlatList, Alert, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Plus, Mountain } from 'lucide-react-native'
 import AddClimbModal from '@/components/journalComponents/addClimbModal'
 import { useAuth } from '@clerk/clerk-expo'
-import { Climb, CreateClimbInput, CreateClimbSchema } from '@/types/app'
+import { Climb, CreateClimbInput } from '@/types/app'
+import { climbEntryItem } from '@/components/journalComponents/climbEntryItem'
+import ClimbEntryModal from '@/components/journalComponents/climbEntryModal'
 
 const Journal = () => {
 
@@ -15,13 +17,21 @@ const Journal = () => {
   const [showBoulders, setShowBoulder] = useState<boolean>(true);
   const [showRoutes, setShowRoutes] = useState<boolean>(false);
   const [toggleAddClimb, setToggleAddClimb] = useState<boolean>(false);
-  const [refresh, setRefresh] = useState<number>(0)
+  const [refresh, setRefresh] = useState<number>(0);
+  const [toggleViewClimb, setToggleViewClimb] = useState<boolean>(false);
+  const [activeClimb, setActiveClimb] = useState<Climb>({} as Climb);
+  
 
   const closeAddClimbModal = () => {
     setToggleAddClimb(false);
   }
 
-  const handleSaveClimb = async (climb: CreateClimbInput) => {
+  const closeViewClimbModal = () => {
+    setToggleViewClimb(false)
+  }
+
+  const handleSaveClimb = async (climb: CreateClimbInput): Promise<boolean> => {
+  
     const token = await getToken()
 
     try {
@@ -37,14 +47,17 @@ const Journal = () => {
       if (response.status === 201) {
         Alert.alert("Climb Added", "Your climb was successfully added")
         setRefresh(prev => prev + 1)
-        return;
+        return true;
       }
 
       Alert.alert("Failed to Add Climb", "Please try again");
+      return false
     } catch (error) {
       console.error(error);
       Alert.alert("Error", "Failed to add climb. Please check your connection.");
+      return false
     }
+    
   }
 
   const fetchClimbs = async () => {
@@ -78,6 +91,9 @@ const Journal = () => {
     fetchClimbs();
   }, [refresh])
 
+
+
+
   return (
     <SafeAreaView className='flex-1 bg-[#1a1d26]'>
       <View className='flex-1 relative'>
@@ -95,9 +111,12 @@ const Journal = () => {
 
         <FlatList
           data={showBoulders ? completedBoulders : completedRoutes}
-          renderItem={() => (<View></View>)}
+          renderItem={({item}) => climbEntryItem({ item, setToggleViewClimb, setActiveClimb})}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={{ paddingBottom: 80 }}
+          showsVerticalScrollIndicator={false}
           ListHeaderComponent={() => (
-            <View className='flex flex-row mt-6 mx-auto border bg-card border-[#3a3d4a] rounded-xl gap-2 items-center justify-center'>
+            <View className='flex flex-row mt-6 mb-6 mx-auto border bg-card border-[#3a3d4a] rounded-xl gap-2 items-center justify-center'>
               <TouchableOpacity
                 className={`${showBoulders ? 'bg-primary' : 'bg-card'} w-40 py-3 rounded-xl`}
                 onPress={() => {
@@ -139,6 +158,15 @@ const Journal = () => {
               visisble={toggleAddClimb}
               onClose={closeAddClimbModal}
               onSave={handleSaveClimb}
+            />
+          )
+        }
+        {
+          toggleViewClimb && (
+            <ClimbEntryModal
+              climb={activeClimb}
+              visible={toggleViewClimb}
+              onClose={closeViewClimbModal}
             />
           )
         }

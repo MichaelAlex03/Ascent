@@ -1,4 +1,4 @@
-import { View, Text, Modal, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native'
+import { View, Text, Modal, TouchableOpacity, TextInput, ScrollView, Alert, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { X, Plus, Minus } from 'lucide-react-native'
@@ -7,7 +7,7 @@ import { Climb, CreateClimbInput, CreateClimbSchema } from '@/types/app'
 interface AddClimbProps {
     visisble: boolean
     onClose: () => void
-    onSave: (climb: CreateClimbInput) => void
+    onSave: (climb: CreateClimbInput) => Promise<boolean>
 }
 
 const boulderGrades = [
@@ -53,7 +53,10 @@ const AddClimbModal = ({ visisble, onClose, onSave }: AddClimbProps) => {
     const grades = addBoulders ? boulderGrades : routeGrades;
 
     const handleSave = async () => {
-        if (isSaving) return;
+        if(isSaving) return;
+
+        setIsSaving(true);
+       
 
         const climb: CreateClimbInput = {
             climb_type: addBoulders ? 'boulder' : 'route',
@@ -67,18 +70,15 @@ const AddClimbModal = ({ visisble, onClose, onSave }: AddClimbProps) => {
         const validation = CreateClimbSchema.safeParse(climb);
         if (!validation.success) {
             Alert.alert("Invalid Input", "One or more of the fields entered is empty or not entered correctly");
+            setIsSaving(false)
             return;
         }
 
-        setIsSaving(true);
-        try {
-            onSave(climb);
-        } catch (error) {
-            console.error(error);
-            Alert.alert("Failed To Add Climb", "Climb was not able to be added please try again")
-        } finally {
-            setIsSaving(false);
-            onClose();
+       
+        const success = await onSave(climb);
+        setIsSaving(false)
+        if (success) {
+            onClose()
         }
     }
 
@@ -91,7 +91,15 @@ const AddClimbModal = ({ visisble, onClose, onSave }: AddClimbProps) => {
             transparent={true}
             statusBarTranslucent={true}
         >
-            <SafeAreaView className='flex-1 bg-black/40' edges={['top', 'bottom']}>
+            <SafeAreaView className='flex-1 bg-black/40 relative' edges={['top', 'bottom']}>
+            {
+                isSaving && (
+                    <View className="absolute inset-0 flex-1 bg-black/60 items-center justify-center z-50">
+                      <ActivityIndicator size="large" color="#6366F1" />
+                      <Text className="text-white text-xs mt-2 font-pmedium">Saving Climb...</Text>
+                    </View>
+                  )
+            }
                 <ScrollView contentContainerStyle={{ paddingTop: 20 }}>
                     <View className='rounded-3xl bg-[#1a1d26] border border-[#3a3d4a] mt-4'>
 

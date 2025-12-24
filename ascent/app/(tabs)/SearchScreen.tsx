@@ -36,7 +36,7 @@ export default function SearchScreen() {
             console.error('Error checking follow status:', error);
         }
     };
-    
+
     const handleSearch = useCallback(async () => {
         if (searchQuery.trim().length === 0) return;
 
@@ -68,7 +68,7 @@ export default function SearchScreen() {
         } finally {
             setLoading(false);
         }
-    }, [searchQuery, getToken]);
+    }, [searchQuery]);
 
 
     const handleFollowToggle = async (targetClerkId: string) => {
@@ -113,7 +113,7 @@ export default function SearchScreen() {
             } else {
                 setResults([]);
             }
-        }, 300);
+        }, 500);
 
         return () => clearTimeout(timer);
     }, [searchQuery, handleSearch]);
@@ -148,9 +148,8 @@ export default function SearchScreen() {
                     {!isOwnProfile && (
                         <TouchableOpacity
                             onPress={() => handleFollowToggle(item.clerk_id)}
-                            className={`px-4 py-2 rounded-lg ${
-                                isFollowing ? 'bg-card border border-border' : 'bg-primary'
-                            }`}
+                            className={`px-4 py-2 rounded-lg ${isFollowing ? 'bg-card border border-border' : 'bg-primary'
+                                }`}
                         >
                             <View className="flex-row items-center gap-2">
                                 {isFollowing ? (
@@ -169,13 +168,15 @@ export default function SearchScreen() {
         );
     };
 
+    console.log(results)
+
     return (
         <SafeAreaView className="flex-1 bg-[#1a1d26]">
             <View className="p-4">
-                {/* Search Header */}
+
                 <Text className="text-white text-2xl font-bold mb-4">Search Climbers</Text>
 
-                {/* Search Input */}
+
                 <View className="flex-row items-center bg-[#272a35] border border-[#3a3d4a] rounded-xl px-4 py-3 mb-4">
                     <Search size={20} color="#94a3b8" />
                     <TextInput
@@ -189,14 +190,14 @@ export default function SearchScreen() {
                     />
                 </View>
 
-                {/* Loading Indicator */}
+
                 {loading && (
                     <View className="items-center py-8">
                         <ActivityIndicator size="large" color="#ff7a3d" />
                     </View>
                 )}
 
-                {/* Results List */}
+
                 {!loading && results.length > 0 && (
                     <FlatList
                         data={results}
@@ -206,7 +207,6 @@ export default function SearchScreen() {
                     />
                 )}
 
-                {/* Empty State */}
                 {!loading && searchQuery.trim().length > 0 && results.length === 0 && (
                     <View className="items-center justify-center mt-16 gap-4">
                         <View className="rounded-full bg-[#272a35] p-6">
@@ -216,6 +216,8 @@ export default function SearchScreen() {
                         <Text className="text-muted-foreground">Try a different search term</Text>
                     </View>
                 )}
+
+
 
                 {/* Initial State */}
                 {!loading && searchQuery.trim().length === 0 && (

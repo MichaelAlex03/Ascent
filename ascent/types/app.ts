@@ -7,7 +7,7 @@ export type WallType = 'slab' | 'vertical' | 'overhang';
 // Full Climb type from database
 export interface Climb {
   id: number;
-  created_at: string;
+  date_climbed: string;
   climb_type: ClimbType;
   climb_attempts: number;
   climb_wall_type: WallType;
