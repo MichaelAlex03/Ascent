@@ -6,6 +6,7 @@ export const handleClerkWebhook = async (req: Request, res: Response) => {
 
     try {
         const eventData = await verifyClerkWebhook(req);
+        console.log(eventData.data)
         if (eventData.type === "user.created"){
             await handleUserCreatedWebhook(eventData.data.id)
         }

@@ -5,6 +5,12 @@ const webhookSupabase = createSupabaseAdminClient()
 export const addClerkUser = async (id: string) => {
     const { error } = await webhookSupabase
         .from('users')
-        .insert({ clerk_id: id })
+        .upsert(
+                { clerk_id: id },
+                {
+                    onConflict: 'clerk_id',
+                    ignoreDuplicates: true
+                }
+            )
     if (error) throw error;
 }
