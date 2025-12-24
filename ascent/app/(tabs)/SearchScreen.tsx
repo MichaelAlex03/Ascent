@@ -7,6 +7,7 @@ import { Text } from '@/components/ui/text';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
 import { UserSearchResult } from '@/types/app';
+import { useCallback } from 'react';
 
 export default function SearchScreen() {
     const { getToken, userId } = useAuth();
@@ -15,20 +16,28 @@ export default function SearchScreen() {
     const [loading, setLoading] = useState(false);
     const [followingStatus, setFollowingStatus] = useState<Record<string, boolean>>({});
 
-    // Debounced search
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (searchQuery.trim().length > 0) {
-                handleSearch();
-            } else {
-                setResults([]);
+    const checkFollowingStatus = async (targetClerkId: string) => {
+        try {
+            const token = await getToken();
+            const response = await fetch(
+                `${process.env.EXPO_PUBLIC_USER_API}/users/${targetClerkId}/is-following`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                }
+            );
+
+            if (response.ok) {
+                const { isFollowing } = await response.json();
+                setFollowingStatus(prev => ({ ...prev, [targetClerkId]: isFollowing }));
             }
-        }, 300);
-
-        return () => clearTimeout(timer);
-    }, [searchQuery]);
-
-    const handleSearch = async () => {
+        } catch (error) {
+            console.error('Error checking follow status:', error);
+        }
+    };
+    
+    const handleSearch = useCallback(async () => {
         if (searchQuery.trim().length === 0) return;
 
         setLoading(true);
@@ -59,31 +68,17 @@ export default function SearchScreen() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [searchQuery, getToken]);
 
-    const checkFollowingStatus = async (targetClerkId: string) => {
-        try {
-            const token = await getToken();
-            const response = await fetch(
-                `${process.env.EXPO_PUBLIC_USER_API}/users/${targetClerkId}/is-following`,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    },
-                }
-            );
-
-            if (response.ok) {
-                const { isFollowing } = await response.json();
-                setFollowingStatus(prev => ({ ...prev, [targetClerkId]: isFollowing }));
-            }
-        } catch (error) {
-            console.error('Error checking follow status:', error);
-        }
-    };
 
     const handleFollowToggle = async (targetClerkId: string) => {
         const isCurrentlyFollowing = followingStatus[targetClerkId];
+
+        // Optimistic updating to avoid race conditions where button is pressed twice
+        setFollowingStatus(prev => ({
+            ...prev,
+            [targetClerkId]: !isCurrentlyFollowing
+        }))
 
         try {
             const token = await getToken();
@@ -98,10 +93,11 @@ export default function SearchScreen() {
                 }
             );
 
-            if (response.ok) {
+            // Rollback if failed
+            if (!response.ok) {
                 setFollowingStatus(prev => ({
                     ...prev,
-                    [targetClerkId]: !isCurrentlyFollowing
+                    [targetClerkId]: isCurrentlyFollowing
                 }));
             }
         } catch (error) {
@@ -109,9 +105,22 @@ export default function SearchScreen() {
         }
     };
 
+    // Debounced search
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (searchQuery.trim().length > 0) {
+                handleSearch();
+            } else {
+                setResults([]);
+            }
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery, handleSearch]);
+
     const renderUserItem = ({ item }: { item: UserSearchResult }) => {
         const isOwnProfile = item.clerk_id === userId;
-        const isFollowing = followingStatus[item.clerk_id];
+        const isFollowing = followingStatus[item.clerk_id]
 
         return (
             <Card className="bg-card border-border mb-3 p-4">
