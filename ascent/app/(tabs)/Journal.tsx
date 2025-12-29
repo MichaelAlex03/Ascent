@@ -106,7 +106,7 @@ const Journal = () => {
           </TouchableOpacity>
         }
         <View className='p-4 border-b border-[#3a3d4a]'>
-          <Text className='text-white text-2xl font-bold'>Journal</Text>
+          <Text className='text-white text-3xl font-bold'>Journal</Text>
         </View>
 
         <FlatList
