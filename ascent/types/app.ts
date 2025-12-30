@@ -45,3 +45,13 @@ export interface UserSearchResult {
     full_name: string;
     avatar_url?: string;
 }
+
+
+export interface User {
+  clerk_id: string;
+  created_at: string;
+  username: string;
+  full_name: string;
+  avatar_url: string;
+  bio: string
+}

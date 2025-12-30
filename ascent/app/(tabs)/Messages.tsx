@@ -1,19 +1,31 @@
-import { View, Text, TextInput } from 'react-native'
+import { View, Text, TextInput, FlatList, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Edit, Search } from 'lucide-react-native'
+import NewConversation from '@/components/messageScreen/newConversation'
+
+const test_data = [{
+  userName: "test",
+  last_text: "Hello how are you doinggggggggggggggggggggggggggg",
+  last_text_time: "1d"
+}]
 
 const Messages = () => {
 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [conversations, setConversations] = useState([]);
   const [refresh, setRefresh] = useState<number>(0);
+  const [toggleAddConvo, setToggleAddConvo] = useState<boolean>(false);
+
+  const closeAddConvoModal = (): void => {
+    setToggleAddConvo(false);
+  }
 
   const fetchConversations = async () => {
     try {
-      
+
     } catch (error) {
-      
+
     }
   }
 
@@ -26,7 +38,12 @@ const Messages = () => {
       <View className='flex-1 p-4'>
         <View className='flex flex-row justify-between items-center'>
           <Text className='text-white text-3xl font-bold'>Messages</Text>
-          <Edit color={'white'} size={24} />
+
+          <TouchableOpacity
+            onPress={() => setToggleAddConvo(true)}
+          >
+            <Edit color={'white'} size={24} />
+          </TouchableOpacity>
         </View>
 
 
@@ -42,7 +59,41 @@ const Messages = () => {
             autoCorrect={false}
           />
         </View>
+
+        <FlatList
+          data={test_data}
+          renderItem={({ item }) => {
+
+            const content = item.last_text.length > 30 ? item.last_text.substring(0, 35) : item.last_text
+
+            return (
+              <View className='flex flex-row items-center gap-2'>
+                <View className='h-12 w-12 rounded-full bg-red-600' />
+
+                <View className='items-start'>
+                  <Text className='text-white'>{item.userName}</Text>
+                  <View className='flex flex-row items-center gap-2'>
+                    <Text className='text-white' numberOfLines={1}>{content}</Text>
+                    <Text className='text-white'>{item.last_text_time}</Text>
+                  </View>
+                </View>
+              </View>
+            )
+
+          }}
+        />
+
+        {
+          toggleAddConvo && (
+            <NewConversation
+              visible={toggleAddConvo}
+              onClose={closeAddConvoModal}
+            />
+          )
+        }
+
       </View>
+
     </SafeAreaView>
   )
 }

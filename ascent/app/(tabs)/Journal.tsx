@@ -2,11 +2,11 @@ import { View, Text, TouchableOpacity, FlatList, Alert, ActivityIndicator } from
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Plus, Mountain } from 'lucide-react-native'
-import AddClimbModal from '@/components/journalComponents/addClimbModal'
+import AddClimbModal from '../../components/journalScreen/addClimbModal'
 import { useAuth } from '@clerk/clerk-expo'
 import { Climb, CreateClimbInput } from '@/types/app'
-import { climbEntryItem } from '@/components/journalComponents/climbEntryItem'
-import ClimbEntryModal from '@/components/journalComponents/climbEntryModal'
+import { climbEntryItem } from '@/components/journalScreen/climbEntryItem'
+import ClimbEntryModal from '@/components/journalScreen/climbEntryModal'
 
 const Journal = () => {
 
@@ -22,11 +22,11 @@ const Journal = () => {
   const [activeClimb, setActiveClimb] = useState<Climb>({} as Climb);
   
 
-  const closeAddClimbModal = () => {
+  const closeAddClimbModal = (): void => {
     setToggleAddClimb(false);
   }
 
-  const closeViewClimbModal = () => {
+  const closeViewClimbModal = (): void => {
     setToggleViewClimb(false)
   }
 
